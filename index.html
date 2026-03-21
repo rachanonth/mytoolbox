@@ -85,7 +85,18 @@
     <div class="grid" id="grid"><div class="state-msg">Loading...</div></div>
   </main>
 
-  <script src="config.js"></script>
+  <script src="config.js" onerror=""></script>
+  <script>
+    async function getConfig() {
+      // On Vercel: fetch from serverless function
+      try {
+        const r = await fetch('/api/config');
+        if (r.ok) return await r.json();
+      } catch {}
+      // Local: use globals from config.js
+      return { SUPABASE_URL, SUPABASE_KEY, ADMIN_CODE };
+    }
+  </script>
   <script>
     // Sky color stops — one per 2-hour block starting at 00:00
     // Each entry: [bg, cardBg, cardHover, letterColor, titleColor, descColor, headerColor]
@@ -180,10 +191,11 @@
 
     async function load() {
       const grid = document.getElementById('grid');
+      const cfg = await getConfig();
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/tools?select=*&order=sort_order.asc,created_at.asc`,
-          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+          `${cfg.SUPABASE_URL}/rest/v1/tools?select=*&order=sort_order.asc,created_at.asc`,
+          { headers: { apikey: cfg.SUPABASE_KEY, Authorization: `Bearer ${cfg.SUPABASE_KEY}` } }
         );
         if (!res.ok) throw new Error(await res.text());
         const tools = await res.json();

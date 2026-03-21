@@ -186,20 +186,33 @@
     </main>
   </div>
 
-  <script src="config.js"></script>
+  <script src="config.js" onerror=""></script>
   <script>
+    async function getConfig() {
+      try {
+        const r = await fetch('/api/config');
+        if (r.ok) return await r.json();
+      } catch {}
+      return { SUPABASE_URL, SUPABASE_KEY, ADMIN_CODE };
+    }
+
     // ── API helpers ──────────────────────────────────────────────
-    const headers = {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation'
-    };
+    let _cfg = null;
+    async function cfg() {
+      if (!_cfg) _cfg = await getConfig();
+      return _cfg;
+    }
 
     async function api(path, method = 'GET', body) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      const c = await cfg();
+      const res = await fetch(`${c.SUPABASE_URL}/rest/v1/${path}`, {
         method,
-        headers,
+        headers: {
+          apikey: c.SUPABASE_KEY,
+          Authorization: `Bearer ${c.SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation'
+        },
         body: body ? JSON.stringify(body) : undefined
       });
       if (!res.ok) throw new Error(await res.text());
@@ -212,9 +225,10 @@
       if (e.key === 'Enter') unlock();
     });
 
-    function unlock() {
+    async function unlock() {
       const val = document.getElementById('code-input').value;
-      if (val === ADMIN_CODE) {
+      const c = await cfg();
+      if (val === c.ADMIN_CODE) {
         document.getElementById('lock-screen').style.display = 'none';
         document.getElementById('admin-panel').style.display = 'block';
         loadTools();
