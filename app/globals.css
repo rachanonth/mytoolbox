@@ -58,6 +58,16 @@ main { padding: 40px; max-width: 1200px; margin: 0 auto; position: relative; z-i
   -webkit-backdrop-filter: blur(16px);
 }
 
+.card-rearranging {
+  cursor: grab !important;
+  user-select: none;
+}
+
+.card-rearranging:active {
+  cursor: grabbing !important;
+  opacity: 0.6;
+}
+
 .card-letter {
   font-size: 2.4rem;
   font-weight: 700;
