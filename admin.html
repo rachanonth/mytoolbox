@@ -190,7 +190,10 @@
   <script>
     async function getConfig() {
       try {
-        const r = await fetch('/api/config');
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const r = await fetch('/api/config', { signal: controller.signal });
+        clearTimeout(timeout);
         if (r.ok) return await r.json();
       } catch {}
       return { SUPABASE_URL, SUPABASE_KEY, ADMIN_CODE };

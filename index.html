@@ -88,12 +88,14 @@
   <script src="config.js" onerror=""></script>
   <script>
     async function getConfig() {
-      // On Vercel: fetch from serverless function
       try {
-        const r = await fetch('/api/config');
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const r = await fetch('/api/config', { signal: controller.signal });
+        clearTimeout(timeout);
         if (r.ok) return await r.json();
       } catch {}
-      // Local: use globals from config.js
+      // Local fallback: globals from config.js
       return { SUPABASE_URL, SUPABASE_KEY, ADMIN_CODE };
     }
   </script>
