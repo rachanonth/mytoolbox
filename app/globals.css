@@ -11,6 +11,13 @@ header {
   align-items: baseline;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+main {
+  position: relative;
+  z-index: 1;
 }
 
 header h1 {
@@ -27,7 +34,7 @@ header h1 {
 }
 .settings-icon:hover { color: rgba(255,255,255,0.75); }
 
-main { padding: 40px; max-width: 1200px; margin: 0 auto; }
+main { padding: 40px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
 
 .grid {
   display: grid;

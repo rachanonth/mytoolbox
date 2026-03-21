@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import './globals.css';
+import DotGrid from './components/DotGrid';
 
 const SKY = [
   ['#0b0c2a','rgba(255,255,255,0.07)','rgba(255,255,255,0.12)','#7b9fff','#e0e8ff','#8090c0','#c0ccff'],
@@ -75,7 +76,8 @@ export default function Home() {
   if (!theme) return null;
 
   return (
-    <div style={{ background: theme.bg, minHeight: '100vh' }}>
+    <div style={{ background: theme.bg, minHeight: '100vh', position: 'relative' }}>
+      <DotGrid />
       <header>
         <h1 style={{ color: theme.header }}>KMP Toolbox</h1>
         <Link href="/admin" className="settings-icon" title="Admin">
