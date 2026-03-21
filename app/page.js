@@ -65,14 +65,22 @@ export default function Home() {
   const [mode,        setMode]        = useState('light');
   const [favorites,   setFavorites]   = useState([]);
   const [showFavOnly, setShowFavOnly] = useState(false);
+  const [compact,     setCompact]     = useState(false);
 
   useEffect(() => {
     setMode(localStorage.getItem('toolbox_theme') || 'light');
+    setCompact(localStorage.getItem('toolbox_compact') === 'true');
     try {
       const saved = localStorage.getItem('toolbox_favorites');
       if (saved) setFavorites(JSON.parse(saved));
     } catch {}
   }, []);
+
+  function toggleCompact() {
+    const next = !compact;
+    setCompact(next);
+    localStorage.setItem('toolbox_compact', String(next));
+  }
 
   function toggleMode() {
     const next = mode === 'light' ? 'dark' : 'light';
@@ -113,7 +121,7 @@ export default function Home() {
     : tools);
 
   return (
-    <div style={{ background: t.bg, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div data-compact={compact} style={{ background: t.bg, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
 
       {/* Decorative blobs — give the blur something to work with */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
@@ -158,6 +166,30 @@ export default function Home() {
               stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d={HEART}/>
             </svg>
+          </button>
+
+          {/* Compact toggle */}
+          <button onClick={toggleCompact} title={compact ? 'Switch to normal view' : 'Switch to compact view'}
+            style={{
+              background: compact ? t.filterBtnActiveBg : 'none',
+              border: 'none', cursor: 'pointer',
+              color: t.toggle, display: 'flex', alignItems: 'center',
+              padding: '2px 4px', borderRadius: '4px',
+            }}>
+            {compact ? (
+              // Large grid icon (normal mode)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+              </svg>
+            ) : (
+              // Small grid icon (compact mode)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="4" height="4"/><rect x="10" y="3" width="4" height="4"/><rect x="17" y="3" width="4" height="4"/>
+                <rect x="3" y="10" width="4" height="4"/><rect x="10" y="10" width="4" height="4"/><rect x="17" y="10" width="4" height="4"/>
+                <rect x="3" y="17" width="4" height="4"/><rect x="10" y="17" width="4" height="4"/><rect x="17" y="17" width="4" height="4"/>
+              </svg>
+            )}
           </button>
 
           {/* Admin */}
