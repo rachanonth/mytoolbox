@@ -2,40 +2,54 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import './globals.css';
-import DotGrid from './components/DotGrid';
 
 const THEMES = {
   light: {
-    bg:               '#F0F7FF',
-    cardBg:           '#FFFFFF',
-    cardHover:        '#E8F4FF',
-    cardBorder:       '1px solid #D0E8FF',
-    cardShadow:       '0 1px 4px rgba(59,130,246,0.08)',
-    cardShadowHover:  '0 4px 16px rgba(59,130,246,0.15)',
+    bg:               'linear-gradient(135deg, #dbeafe 0%, #eff6ff 40%, #e0f2fe 100%)',
+    // background blobs
+    blob1:            'radial-gradient(ellipse at 20% 20%, rgba(147,197,253,0.55) 0%, transparent 60%)',
+    blob2:            'radial-gradient(ellipse at 80% 70%, rgba(196,181,253,0.45) 0%, transparent 55%)',
+    blob3:            'radial-gradient(ellipse at 55% 10%, rgba(125,211,252,0.40) 0%, transparent 50%)',
+    // cards
+    cardBg:           'rgba(255,255,255,0.55)',
+    cardHover:        'rgba(255,255,255,0.80)',
+    cardBorder:       '1px solid rgba(255,255,255,0.80)',
+    cardShadow:       '0 2px 12px rgba(59,130,246,0.08)',
+    cardShadowHover:  '0 8px 32px rgba(59,130,246,0.14)',
+    // text
     letter:           '#1D6FCC',
     title:            '#0F2942',
     desc:             '#4A6A8A',
     header:           '#0F2942',
-    border:           'rgba(59,130,246,0.15)',
+    headerBg:         'rgba(240,247,255,0.60)',
+    border:           'rgba(255,255,255,0.50)',
     toggle:           '#4A90D9',
+    // favorites
     favIconInactive:  'rgba(59,130,246,0.25)',
     favIconActive:    '#E05C5C',
     favIconHover:     'rgba(59,130,246,0.55)',
     filterBtnActiveBg:'rgba(59,130,246,0.12)',
   },
   dark: {
-    bg:               '#121212',
-    cardBg:           '#1E1E1E',
-    cardHover:        '#252525',
-    cardBorder:       '1px solid #2A2A2A',
-    cardShadow:       '0 1px 4px rgba(0,0,0,0.4)',
-    cardShadowHover:  '0 4px 16px rgba(56,189,248,0.1)',
+    bg:               'linear-gradient(135deg, #0a0f1e 0%, #121212 45%, #0c1a14 100%)',
+    blob1:            'radial-gradient(ellipse at 15% 25%, rgba(30,58,138,0.55) 0%, transparent 60%)',
+    blob2:            'radial-gradient(ellipse at 85% 65%, rgba(6,78,59,0.45) 0%, transparent 55%)',
+    blob3:            'radial-gradient(ellipse at 60% 5%,  rgba(14,116,144,0.35) 0%, transparent 50%)',
+    // cards
+    cardBg:           'rgba(255,255,255,0.06)',
+    cardHover:        'rgba(255,255,255,0.11)',
+    cardBorder:       '1px solid rgba(255,255,255,0.10)',
+    cardShadow:       '0 2px 12px rgba(0,0,0,0.35)',
+    cardShadowHover:  '0 8px 32px rgba(0,0,0,0.50)',
+    // text
     letter:           '#38BDF8',
     title:            '#E8F4FF',
     desc:             '#6A8FAA',
     header:           '#C8E0F4',
-    border:           'rgba(56,189,248,0.12)',
+    headerBg:         'rgba(10,15,30,0.55)',
+    border:           'rgba(255,255,255,0.08)',
     toggle:           '#38BDF8',
+    // favorites
     favIconInactive:  'rgba(56,189,248,0.22)',
     favIconActive:    '#F87171',
     favIconHover:     'rgba(56,189,248,0.55)',
@@ -52,7 +66,6 @@ export default function Home() {
   const [favorites,   setFavorites]   = useState([]);
   const [showFavOnly, setShowFavOnly] = useState(false);
 
-  // Load persisted preferences
   useEffect(() => {
     setMode(localStorage.getItem('toolbox_theme') || 'light');
     try {
@@ -95,13 +108,21 @@ export default function Home() {
   }, []);
 
   const t = THEMES[mode];
-  const displayedTools = tools && (showFavOnly ? tools.filter(tool => favorites.includes(String(tool.id))) : tools);
+  const displayedTools = tools && (showFavOnly
+    ? tools.filter(tool => favorites.includes(String(tool.id)))
+    : tools);
 
   return (
-    <div style={{ background: t.bg, minHeight: '100vh', position: 'relative' }}>
-      <DotGrid mode={mode} />
+    <div style={{ background: t.bg, minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
 
-      <header style={{ borderBottomColor: t.border }}>
+      {/* Decorative blobs — give the blur something to work with */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', inset: 0, background: t.blob1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: t.blob2 }} />
+        <div style={{ position: 'absolute', inset: 0, background: t.blob3 }} />
+      </div>
+
+      <header style={{ borderBottomColor: t.border, background: t.headerBg, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', position: 'relative', zIndex: 2 }}>
         <h1 style={{ color: t.header }}>KMP Toolbox</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
 
@@ -149,7 +170,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main>
+      <main style={{ position: 'relative', zIndex: 1 }}>
         <div className="grid">
           {error ? (
             <div className="state-msg" style={{ color: t.desc }}>{error}</div>
@@ -175,7 +196,6 @@ export default function Home() {
                 onMouseEnter={e => { e.currentTarget.style.background = t.cardHover; e.currentTarget.style.boxShadow = t.cardShadowHover; }}
                 onMouseLeave={e => { e.currentTarget.style.background = t.cardBg;    e.currentTarget.style.boxShadow = t.cardShadow; }}
               >
-                {/* Favorite button */}
                 <button
                   onClick={e => { e.preventDefault(); e.stopPropagation(); toggleFavorite(tool.id); }}
                   title={isFav ? 'Remove from favorites' : 'Add to favorites'}
