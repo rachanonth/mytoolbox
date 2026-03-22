@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import './globals.css';
+import PWAInstallHint from './components/PWAInstallHint';
 
 const LS_THEME     = 'toolbox_theme';
 const LS_COMPACT   = 'toolbox_compact';
@@ -363,6 +364,8 @@ export default function Home() {
           })}
         </div>
       </main>
+
+      <PWAInstallHint mode={mode} />
     </div>
   );
 }
