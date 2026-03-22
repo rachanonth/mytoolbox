@@ -8,6 +8,7 @@ export default function Admin() {
   const [code, setCode] = useState('');
   const [lockError, setLockError] = useState('');
   const [cfg, setCfg] = useState(null);
+  const [unlocking, setUnlocking] = useState(false);
 
   const [tools, setTools] = useState([]);
   const [listMsg, setListMsg] = useState('');
@@ -54,14 +55,28 @@ export default function Admin() {
     }
   }
 
-  function unlock() {
-    if (!cfg) return;
-    if (code === cfg.ADMIN_CODE) {
-      setLocked(false);
-      loadTools();
-    } else {
-      setLockError('Incorrect code.');
-      setCode('');
+  async function unlock() {
+    if (unlocking) return;
+    setUnlocking(true);
+    setLockError('');
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setLocked(false);
+        loadTools();
+      } else {
+        setLockError(data.error || 'Incorrect code.');
+        setCode('');
+      }
+    } catch {
+      setLockError('Network error. Try again.');
+    } finally {
+      setUnlocking(false);
     }
   }
 
@@ -141,7 +156,9 @@ export default function Admin() {
             autoComplete="off"
           />
           <div className="lock-error">{lockError}</div>
-          <button className="btn btn-primary" onClick={unlock}>Enter</button>
+          <button className="btn btn-primary" onClick={unlock} disabled={unlocking}>
+            {unlocking ? 'Checking...' : 'Enter'}
+          </button>
         </div>
       </div>
     );

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Bash(find /Users/kurapika/mytoolbox/app -type f -name *.js -o -name *.jsx -o -name *.ts -o -name *.tsx)"
     ]
   }
 }
